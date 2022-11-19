@@ -7,66 +7,86 @@ package com.mycompany.servidorchat;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
  *
- * @author Dam
+ * @author capea
  */
 public class HiloServidor extends Thread{
-    private ArrayList<Socket> listaUsuario;
+    private Socket cliente;
+    private static List<Socket> listaClientes = new ArrayList<>();
+    private DataInputStream input;
+    private DataOutputStream output;
+    private boolean continuar;
     
-    public HiloServidor(ArrayList<Socket> listaUsu) {
-        this.listaUsuario=listaUsu;
+
+    public HiloServidor(Socket cliente) {
+        continuar =true;
+        this.cliente = cliente;
+        listaClientes.add(cliente);
+        try {
+            this.input = new DataInputStream(cliente.getInputStream());
+            this.output = new DataOutputStream(cliente.getOutputStream());
+        } catch (IOException ex) {
+            Logger.getLogger(HiloServidor.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
     }
 
     @Override
     public void run() {
-            while(true){
-            recibirDatos();}
-            
-           
-            
+        while (continuar) {            
+            recibirMensaje();
+        }
         
+        try {
+            cliente.close();
+            input.close();
+            output.close();
+        } catch (IOException ex) {
+            Logger.getLogger(HiloServidor.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
     }
     
-    private void recibirDatos(){
-        String mensaje = "";
-        for (Socket usu : listaUsuario) {
-            try {
-                DataInputStream reader = new DataInputStream(usu.getInputStream());
-                String msg = reader.readUTF();
-                System.out.println(msg);
-                if (msg.equals("")==false) {
-                    mensaje=msg;
-                    enviarDatos(mensaje);
+    private void recibirMensaje(){
+        try {
+            String inputMSG = this.input.readUTF();
+            
+            if (inputMSG.contains("-exit")) {
+                continuar=false;
+                System.out.println("Un cliente salió");
+                
+                inputMSG = inputMSG.replace("-exit", "");
+                
+                inputMSG = inputMSG +" salió de la sala";
+            }
+            
+            for (Socket c : listaClientes) {
+                if (c.isClosed()) {
+                    
+                } else {
+                    DataOutputStream out = new DataOutputStream(c.getOutputStream());
+                    out.writeUTF(inputMSG);
                 }
                 
-            } catch (IOException ex) {
-                Logger.getLogger(HiloServidor.class.getName()).log(Level.SEVERE, null, ex);
+                
+                    
             }
             
+        } catch (IOException ex) {
+            Logger.getLogger(HiloServidor.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        
     }
     
-    private void enviarDatos(String mensaje){
-        for (Socket usu : listaUsuario) {
-            try {
-                DataOutputStream writer = new DataOutputStream(usu.getOutputStream());
-                writer.writeUTF(mensaje);
-                
-                
-            } catch (IOException ex) {
-                Logger.getLogger(HiloServidor.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            
-        }
-    }
+    
+    
     
 }
