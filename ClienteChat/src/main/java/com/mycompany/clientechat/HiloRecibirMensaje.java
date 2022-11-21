@@ -38,7 +38,7 @@ public class HiloRecibirMensaje extends Thread{
             String msg = input.readUTF();
             ventanaCliente.getTxtChat().setText(ventanaCliente.getTxtChat().getText()+"\n"+msg);
         } catch (IOException ex) {
-            
+            System.out.println("Algo falló");
         }
         
     };

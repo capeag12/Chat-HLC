@@ -152,6 +152,8 @@ public class Cliente extends javax.swing.JFrame {
         } catch (IOException ex) {
             
         }
+        
+        txtMsg.setText("");
     }//GEN-LAST:event_btnEnviarActionPerformed
 
     private void btnSalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalirActionPerformed
@@ -183,17 +185,7 @@ public class Cliente extends javax.swing.JFrame {
     }//GEN-LAST:event_formWindowClosing
 
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
-         try {
-            output.writeUTF(nombre+"-exit");
-            output.close();
-            input.close();
-            cliente.close();
-            
-        } catch (IOException ex) {
-            
-        }
-        JOptionPane.showMessageDialog(rootPane, "Has salido del chat");
-        this.dispose();
+         
     }//GEN-LAST:event_formWindowClosed
 
     /**
