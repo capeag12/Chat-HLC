@@ -65,6 +65,10 @@ public class HiloServidor extends Thread{
                 inputMSG = inputMSG.replace("-exit", "");
                 
                 inputMSG = inputMSG +" salió de la sala";
+                
+                output.close();
+                input.close();
+                cliente.close();
             }
             
             for (Socket c : listaClientes) {
